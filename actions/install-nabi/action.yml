@@ -1,0 +1,77 @@
+# Inputs: one of version, pin, candidate-run
+# Outputs: version, bin
+# Permissions: contents read (actions read for candidate-run)
+# Puts bin on PATH and sets NABI_HOME for the rest of the job.
+# A release must carry SHA256SUMS signed with the release key
+# (B33E6FE61BE5314C, embedded in lib/toolchain.sh as release_key); a
+# pinned, checksum-checked minisign 0.12 verifies it. Fails closed.
+name: Install Nabi
+description: Install a Nabi toolchain from GitHub releases or a run's dist artifacts, checked against the signed SHA256SUMS and the build attestation.
+inputs:
+  version:
+    description: 'A toolchain pin: "0.2" (newest final 0.2.x, never an rc), "0.2.1" (exactly), "0.3.0-rc.1" (that prerelease)'
+    default: ""
+  pin:
+    description: Path of a nabi.nabion; installs what its toolchain pin accepts
+    default: ""
+  candidate-run:
+    description: A run id of the toolchain repo; installs this host's archive from its dist-* artifacts
+    default: ""
+  home:
+    description: NABI_HOME (default ~/.nabi)
+    default: ""
+  attest:
+    description: Also verify the archive's build attestation (release installs only)
+    default: "true"
+  repo:
+    description: The toolchain repository
+    default: nabi-lang/nabi
+  token:
+    description: Token for the GitHub API (releases, artifacts, attestations)
+    default: ${{ github.token }}
+outputs:
+  version:
+    description: The installed version, e.g. 0.2.1
+    value: ${{ steps.install.outputs.version }}
+  bin:
+    description: The directory with nabi, nabic and nabils
+    value: ${{ steps.install.outputs.bin }}
+runs:
+  using: composite
+  steps:
+    - name: Install Nabi
+      id: install
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        NABI_REPO: ${{ inputs.repo }}
+        IN_VERSION: ${{ inputs.version }}
+        IN_PIN: ${{ inputs.pin }}
+        IN_RUN: ${{ inputs.candidate-run }}
+        IN_HOME: ${{ inputs.home }}
+        IN_ATTEST: ${{ inputs.attest }}
+      # puts nabi on PATH and sets NABI_HOME, which is the point of the action
+      run: | # zizmor: ignore[github-env]
+        set -eu
+        lib=$GITHUB_ACTION_PATH/../../lib
+        if command -v cygpath > /dev/null; then lib=$(cygpath -u "$lib"); fi
+        set --
+        [ -z "$IN_VERSION" ] || set -- "$@" --version "$IN_VERSION"
+        [ -z "$IN_PIN" ] || set -- "$@" --pin-file "$IN_PIN"
+        [ -z "$IN_RUN" ] || set -- "$@" --candidate-run "$IN_RUN"
+        [ -z "$IN_HOME" ] || set -- "$@" --home "$IN_HOME"
+        [ "$IN_ATTEST" = true ] || set -- "$@" --no-attest
+        sh "$lib/toolchain.sh" install "$@" > "$RUNNER_TEMP/install-nabi.out"
+        cat "$RUNNER_TEMP/install-nabi.out"
+        version=$(sed -n 's/^version=//p' "$RUNNER_TEMP/install-nabi.out")
+        bin=$(sed -n 's/^bin=//p' "$RUNNER_TEMP/install-nabi.out")
+        home=${bin%/bin}
+        if command -v cygpath > /dev/null; then
+          bin=$(cygpath -w "$bin")
+          home=$(cygpath -w "$home")
+        fi
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+        echo "bin=$bin" >> "$GITHUB_OUTPUT"
+        echo "$bin" >> "$GITHUB_PATH"
+        echo "NABI_HOME=$home" >> "$GITHUB_ENV"
+        echo "installed nabi $version"

@@ -1,0 +1,26 @@
+# Inputs: dir, base
+# Outputs: none
+# Permissions: none (the dependencies are public repositories)
+# Clones each Dep::path("../x") of the package beside it, transitively.
+name: Clone path dependencies
+description: "Clone a package's sibling path dependencies from the org so that Dep::path(\"../x\") resolves in CI."
+inputs:
+  dir:
+    description: The package directory
+    default: .
+  base:
+    description: Where the dependency repositories are cloned from
+    default: https://github.com/${{ github.repository_owner }}
+runs:
+  using: composite
+  steps:
+    - name: Clone path dependencies
+      shell: bash
+      env:
+        IN_DIR: ${{ inputs.dir }}
+        NABI_DEPS_BASE: ${{ inputs.base }}
+      run: |
+        set -eu
+        lib=$GITHUB_ACTION_PATH/../../lib
+        if command -v cygpath > /dev/null; then lib=$(cygpath -u "$lib"); fi
+        sh "$lib/path-deps.sh" "$IN_DIR"

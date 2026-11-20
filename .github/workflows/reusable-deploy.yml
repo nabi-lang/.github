@@ -1,0 +1,28 @@
+# Ask the deploy pipeline to ship a site. Callers pass the site name;
+# nothing else about the deploy lives in a public repository.
+name: Reusable / Dispatch a deploy
+
+on:
+  workflow_call:
+    inputs:
+      site:
+        description: nabi-web, packages, playground, packages-index or content
+        type: string
+        required: true
+    secrets:
+      GH_DISPATCH_TOKEN_INFRA:
+        required: false
+
+jobs:
+  dispatch:
+    name: Dispatch the deploy to infra
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Send repository_dispatch to nabi-lang/infra
+        env:
+          GH_TOKEN: ${{ secrets.GH_DISPATCH_TOKEN_INFRA }}
+          SITE: ${{ inputs.site }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then echo "no dispatch token; skipped"; exit 0; fi
+          gh api repos/nabi-lang/infra/dispatches -f event_type="$SITE" \
+            -f "client_payload[repo]=$GITHUB_REPOSITORY" -f "client_payload[sha]=$GITHUB_SHA"

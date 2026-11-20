@@ -1,0 +1,61 @@
+# Developer Certificate of Origin: every commit of a pull request carries a
+# Signed-off-by line with its author's email. Merge commits and bot authors
+# are skipped. On any event but pull_request it passes without checking:
+# the merge queue and main only ever get commits a PR already passed.
+name: Reusable / DCO sign-off
+
+on:
+  workflow_call:
+    inputs:
+      exempt:
+        description: Extended regex of author emails that need no sign-off
+        type: string
+        default: '^[0-9]+\+[^@]+\[bot\]@users\.noreply\.github\.com$'
+
+permissions:
+  contents: read
+
+jobs:
+  dco:
+    name: Check sign-off
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check out the pull request head
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Check Signed-off-by lines
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+          EXEMPT: ${{ inputs.exempt }}
+        run: |
+          set -eu
+          if [ "$EVENT" != pull_request ]; then
+            echo "not a pull request ($EVENT): nothing to check"
+            exit 0
+          fi
+          bad=0
+          n=0
+          for c in $(git rev-list --no-merges "$BASE..$HEAD"); do
+            n=$((n + 1))
+            email=$(git show -s --format=%ae "$c")
+            subject=$(git show -s --format=%s "$c")
+            if printf '%s\n' "$email" | grep -Eq -- "$EXEMPT"; then
+              echo "skip $c ($email)"
+              continue
+            fi
+            if git show -s --format=%B "$c" | grep -Ei '^Signed-off-by: .+ <.+>' | grep -Fiq -- "<$email>"; then
+              echo "ok   $c $subject"
+            else
+              echo "::error::$c \"$subject\" has no 'Signed-off-by: <name> <$email>' line. Sign it with 'git commit --amend -s' (last commit) or 'git rebase --signoff main' (all), then push again; see CONTRIBUTING.md, Sign your work"
+              bad=1
+            fi
+          done
+          echo "$n commits checked"
+          exit "$bad"

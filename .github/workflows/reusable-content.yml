@@ -1,0 +1,90 @@
+# Check and bundle a content repository (docs, www, spec) for the Nabi sites.
+# A vX.Y.Z branch is checked with nabi X.Y.Z, main with the latest release.
+# A push that passes asks the deploy pipeline to rebuild the sites.
+name: Reusable / Check and bundle content
+
+on:
+  workflow_call:
+    inputs:
+      check:
+        description: Run the nabi blocks and compare the documented diagnostics
+        type: boolean
+        default: true
+    secrets:
+      GH_DISPATCH_TOKEN_INFRA:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  bundle:
+    name: Check and bundle
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install zlib for the FFI examples
+        run: sudo apt-get install -y -q zlib1g-dev
+
+      - name: Resolve the toolchain for this branch
+        id: tc
+        run: |
+          case "$GITHUB_REF_NAME" in
+            v[0-9]*.[0-9]*.[0-9]*) v="${GITHUB_REF_NAME#v}" ;;
+            *) v=$(gh release view -R nabi-lang/nabi --json tagName -q .tagName); v="${v#v}" ;;
+          esac
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Install Nabi
+        uses: nabi-lang/.github/actions/install-nabi@v1.0.0
+        with:
+          version: ${{ steps.tc.outputs.version }}
+
+      - name: Check out nabi-lang/web
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          repository: nabi-lang/web
+          path: .web
+
+      - name: Build nabi_content
+        run: cd .web/tools/content && nabi build --release
+
+      - name: Check the content with nabi_content
+        if: inputs.check
+        run: .web/tools/content/target/release/nabi_content check .
+        env:
+          # nabic finds system libraries (-lz) through LIBRARY_PATH.
+          LIBRARY_PATH: /usr/lib/x86_64-linux-gnu
+
+      - name: Bundle the content with nabi_content
+        run: >
+          .web/tools/content/target/release/nabi_content bundle .
+          --repo "$GITHUB_REPOSITORY" --branch "$GITHUB_REF_NAME" --sha "$GITHUB_SHA"
+          --toolchain "$TOOLCHAIN" --out bundle.nabion
+        env:
+          TOOLCHAIN: ${{ steps.tc.outputs.version }}
+
+      - name: Upload the bundle artifact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: bundle
+          path: bundle.nabion
+
+  deploy:
+    name: Deploy
+    needs: bundle
+    if: github.event_name == 'push'
+    permissions: {}
+    uses: nabi-lang/.github/.github/workflows/reusable-deploy.yml@v1.0.0
+    with:
+      site: content
+    secrets:
+      GH_DISPATCH_TOKEN_INFRA: ${{ secrets.GH_DISPATCH_TOKEN_INFRA }}

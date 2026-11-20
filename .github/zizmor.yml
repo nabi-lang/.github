@@ -1,0 +1,7 @@
+# Our own actions and workflows pin a release tag (later its SHA); third-party actions stay SHA-pinned.
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        "nabi-lang/*": ref-pin
+        "*": hash-pin

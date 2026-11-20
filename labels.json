@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "labels": [
+    {
+      "name": "type: bug",
+      "color": "d73a4a",
+      "description": "Something does not work as documented"
+    },
+    {
+      "name": "type: feature",
+      "color": "a2eeef",
+      "description": "A new capability or an improvement"
+    },
+    {
+      "name": "type: docs",
+      "color": "0075ca",
+      "description": "Docs, spec text, READMEs, comments"
+    },
+    {
+      "name": "type: performance",
+      "color": "fbca04",
+      "description": "Speed, memory or binary size"
+    },
+    {
+      "name": "type: security",
+      "color": "b60205",
+      "description": "A security fix or hardening (report vulnerabilities privately, see SECURITY.md)"
+    },
+    {
+      "name": "type: breaking",
+      "color": "e11d21",
+      "description": "Changes behavior that existing code relies on"
+    },
+    {
+      "name": "type: chore",
+      "color": "ededed",
+      "description": "Maintenance nobody using Nabi can see"
+    },
+    {
+      "name": "area: compiler",
+      "color": "c5def5",
+      "description": "nabic, cc, link, the end-to-end corpus"
+    },
+    {
+      "name": "area: runtime",
+      "color": "c5def5",
+      "description": "The runtime and its collector"
+    },
+    {
+      "name": "area: stdlib",
+      "color": "c5def5",
+      "description": "core, std, bare"
+    },
+    {
+      "name": "area: tooling",
+      "color": "c5def5",
+      "description": "nabi, nabils, the REPL, the installers"
+    },
+    {
+      "name": "area: ci",
+      "color": "c5def5",
+      "description": "Workflows, actions, release pipeline"
+    },
+    {
+      "name": "area: targets",
+      "color": "c5def5",
+      "description": "A platform target or host archive"
+    },
+    {
+      "name": "area: spec",
+      "color": "c5def5",
+      "description": "The language and library specification"
+    },
+    {
+      "name": "area: docs",
+      "color": "c5def5",
+      "description": "The guide, examples and error pages"
+    },
+    {
+      "name": "area: web",
+      "color": "c5def5",
+      "description": "The sites, the playground and the web kit"
+    },
+    {
+      "name": "area: registry",
+      "color": "c5def5",
+      "description": "packages.nabi-lang.org and its index"
+    },
+    {
+      "name": "area: editors",
+      "color": "c5def5",
+      "description": "Grammars and editor support"
+    },
+    {
+      "name": "area: i18n",
+      "color": "c5def5",
+      "description": "The Korean editions and translation"
+    },
+    {
+      "name": "status: triage",
+      "color": "fef2c0",
+      "description": "Not looked at by a maintainer yet"
+    },
+    {
+      "name": "status: needs info",
+      "color": "fef2c0",
+      "description": "Waiting for the reporter"
+    },
+    {
+      "name": "status: confirmed",
+      "color": "0e8a16",
+      "description": "Reproduced or accepted; open for a fix"
+    },
+    {
+      "name": "status: blocked",
+      "color": "5319e7",
+      "description": "Waits on another issue or an outside change"
+    },
+    {
+      "name": "status: duplicate",
+      "color": "cfd3d7",
+      "description": "Already tracked elsewhere"
+    },
+    {
+      "name": "status: wontfix",
+      "color": "ffffff",
+      "description": "Out of scope or working as intended"
+    },
+    {
+      "name": "good first issue",
+      "color": "7057ff",
+      "description": "Small, well described, a good start"
+    },
+    {
+      "name": "help wanted",
+      "color": "008672",
+      "description": "A maintainer would welcome a pull request"
+    },
+    {
+      "name": "release",
+      "color": "1d76db",
+      "description": "Release record issue (release.yml)"
+    },
+    {
+      "name": "rehearsal",
+      "color": "bfdadc",
+      "description": "Release rehearsal record (release.yml)"
+    },
+    {
+      "name": "alarm",
+      "color": "b60205",
+      "description": "Opened and closed by a check (actions/sync-alarm-issue)"
+    }
+  ]
+}

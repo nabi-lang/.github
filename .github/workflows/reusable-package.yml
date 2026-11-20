@@ -1,0 +1,95 @@
+# Format, test and publish check of a package repository, on the toolchain
+# its nabi.nabion pins. Path dependencies (Dep::path("../x")) are cloned
+# from this org beside the checkout.
+name: Reusable / Test a package
+
+on:
+  workflow_call:
+    inputs:
+      wasm:
+        description: Also run the tests on wasm32-wasip2 under wasmtime
+        type: boolean
+        default: true
+      publish-check:
+        description: Run nabi publish --dry-run
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check format and publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Clone path dependencies
+        uses: nabi-lang/.github/actions/clone-path-deps@v1.0.0
+      - name: Install Nabi from the nabi.nabion pin
+        uses: nabi-lang/.github/actions/install-nabi@v1.0.0
+        with:
+          pin: nabi.nabion
+      - name: Check format with nabi fmt
+        run: nabi fmt --check
+      - name: Check publishing with nabi publish --dry-run
+        if: inputs.publish-check
+        run: nabi publish --dry-run
+
+  test:
+    name: Test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-26, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Clone path dependencies
+        uses: nabi-lang/.github/actions/clone-path-deps@v1.0.0
+      - name: Install Nabi from the nabi.nabion pin
+        uses: nabi-lang/.github/actions/install-nabi@v1.0.0
+        with:
+          pin: nabi.nabion
+      - name: Run nabi test
+        run: nabi test
+
+  wasm:
+    name: Test (ubuntu-24.04, wasm32-wasip2)
+    if: inputs.wasm
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Clone path dependencies
+        uses: nabi-lang/.github/actions/clone-path-deps@v1.0.0
+      - name: Install Nabi from the nabi.nabion pin
+        uses: nabi-lang/.github/actions/install-nabi@v1.0.0
+        with:
+          pin: nabi.nabion
+      # same release and checksum as nabi's scripts/test/wasm.sh
+      - name: Install wasmtime 46.0.3
+        run: |
+          set -eu
+          n=wasmtime-v46.0.3-x86_64-linux
+          cd "$RUNNER_TEMP"
+          curl -fsSL --proto '=https' -o "$n.tar.xz" "https://github.com/bytecodealliance/wasmtime/releases/download/v46.0.3/$n.tar.xz"
+          echo "a13087bea96394e183a205d653e7337d50b596aca3090d496330efc770a54121  $n.tar.xz" | sha256sum -c -
+          tar -xJf "$n.tar.xz"
+          echo "$RUNNER_TEMP/$n" >> "$GITHUB_PATH"
+      - name: Run nabi test on wasm32-wasip2
+        run: nabi test --target wasm32-wasip2
