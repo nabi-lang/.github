@@ -20,7 +20,7 @@ jobs:
     name: DCO
     permissions:
       contents: read
-    uses: ./.github/workflows/reusable-dco.yml
+    uses: $/.github/workflows/reusable-dco.yml
 
   lint:
     name: Lint

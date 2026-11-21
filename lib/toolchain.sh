@@ -5,6 +5,8 @@
 #   toolchain.sh pin <nabi.nabion>             print its toolchain: pin
 #   toolchain.sh kind <pin>                  series, exact or pre
 #   toolchain.sh resolve <pin>               newest release the pin accepts
+#   toolchain.sh resolve latest              newest final release, else
+#                                            the newest rc (a warning)
 #   toolchain.sh triple                      this host's target triple
 #   toolchain.sh minisign <dir>              fetch the pinned minisign into
 #                                            <dir>, print the binary's path
@@ -15,8 +17,9 @@
 # A pin is MAJOR.MINOR (newest final release of that series),
 # MAJOR.MINOR.PATCH (exactly that) or X.Y.Z-rc.N (that prerelease). A
 # series takes a prerelease only while it has no final release at all,
-# its newest X.Y.Z-rc.N, with a warning. install prints "version=<v>" and
-# "bin=<dir>" lines.
+# its newest X.Y.Z-rc.N, with a warning. latest (--version only, never a
+# nabi.nabion pin) is the same rule over all series: the newest final,
+# else the newest rc. install prints "version=<v>" and "bin=<dir>" lines.
 #
 # A release install checks, failing closed: SHA256SUMS.minisig verifies
 # SHA256SUMS with the release key and its trusted comment names the
@@ -65,12 +68,15 @@ pin_of() {
 	[ -f "$1" ] || die "$1 does not exist"
 	_p=$(sed -n 's/^[[:space:]]*toolchain:[[:space:]]*"\([^"]*\)".*/\1/p' "$1" | head -n 1)
 	[ -n "$_p" ] || die "$1 pins no toolchain; add toolchain: \"0.2\" to its Package"
+	[ "$_p" != latest ] || die "$1 pins toolchain \"latest\", which only --version takes; pin a series, e.g. toolchain: \"0.2\""
 	echo "$_p"
 }
 
-# pin_kind <pin>: series, exact or pre; fails on anything else.
+# pin_kind <pin>: series, exact, pre or latest; fails on anything else.
 pin_kind() {
-	if echo "$1" | grep -Eq '^[0-9]+\.[0-9]+$'; then
+	if [ "$1" = latest ]; then
+		echo latest
+	elif echo "$1" | grep -Eq '^[0-9]+\.[0-9]+$'; then
 		echo series
 	elif echo "$1" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
 		echo exact
@@ -98,6 +104,17 @@ resolve() {
 				if (r ~ /^[0-9]+-rc\.[0-9]+$/) { split(r, a, /-rc\./); print a[1], a[2], substr($1, 2) }
 			}' | sort -k 1,1n -k 2,2n | tail -n 1 | cut -d ' ' -f 3)
 			[ -z "$_v" ] || echo "::warning::install-nabi: no final $1 release yet; using $_v" >&2
+		fi
+		;;
+	latest)
+		_v=$(printf '%s\n' "$_rels" | awk '$2 == "false" && $3 == "false" && $1 ~ /^v[0-9]+\.[0-9]+\.[0-9]+$/ {
+			split(substr($1, 2), a, /\./); print a[1], a[2], a[3], substr($1, 2)
+		}' | sort -k 1,1n -k 2,2n -k 3,3n | tail -n 1 | cut -d ' ' -f 4)
+		if [ -z "$_v" ]; then
+			_v=$(printf '%s\n' "$_rels" | awk '$3 == "false" && $1 ~ /^v[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$/ {
+				split(substr($1, 2), a, /[.-]/); print a[1], a[2], a[3], a[5], substr($1, 2)
+			}' | sort -k 1,1n -k 2,2n -k 3,3n -k 4,4n | tail -n 1 | cut -d ' ' -f 5)
+			[ -z "$_v" ] || echo "::warning::install-nabi: no final nabi release yet; using $_v" >&2
 		fi
 		;;
 	*)

@@ -63,6 +63,30 @@ for bad in "0" "0.2.x" "^0.2" "v0.2" "0.2.0-beta" "0.2.0-rc" "0.2.0-rc.1.1" "0.2
 	has "$err" 'write a series ("0.2")'
 done
 
+t_case "latest: the newest final of any series"
+eq "$(sh "$tc" resolve latest)" 0.20.0 "0.20.0 over 0.2.9, rcs and drafts left out"
+eq "$(sh "$tc" kind latest)" latest
+printf 'Package {\n    name: "x",\n    toolchain: "latest",\n}\n' > "$SHIM/latest.nabion"
+err=$(sh "$tc" pin "$SHIM/latest.nabion" 2>&1) && fail "a latest pin file accepted"
+has "$err" 'which only --version takes'
+
+t_case "latest with no final takes the newest rc"
+cp "$SHIM/state.json" "$SHIM/state.keep"
+state '{repos: {"nabi-lang/nabi": {releases: [
+	{tag_name: "v0.2.0-rc.1", prerelease: true, draft: true},
+	{tag_name: "v0.1.1-rc.1", prerelease: true, draft: false},
+	{tag_name: "v0.1.0-rc.10", prerelease: true, draft: false},
+	{tag_name: "v0.1.0-rc.2", prerelease: true, draft: false},
+	{tag_name: "v0.1.0-beta.3", prerelease: true, draft: false}]}}}'
+eq "$(sh "$tc" resolve latest 2> /dev/null)" 0.1.1-rc.1 "0.1.1-rc.1 over 0.1.0-rc.10, the draft 0.2.0-rc.1 left out"
+err=$(sh "$tc" resolve latest 2>&1 > /dev/null)
+has "$err" "::warning::install-nabi: no final nabi release yet; using 0.1.1-rc.1"
+state '{repos: {"nabi-lang/nabi": {releases: [
+	{tag_name: "v0.1.0-rc.10", prerelease: true, draft: false},
+	{tag_name: "v0.1.0-rc.9", prerelease: true, draft: false}]}}}'
+eq "$(sh "$tc" resolve latest 2> /dev/null)" 0.1.0-rc.10 "rc.10 over rc.9"
+cp "$SHIM/state.keep" "$SHIM/state.json"
+
 t_case "host triple"
 # fake_host <uname -s> <uname -m> [<reg's PROCESSOR_ARCHITECTURE>]
 fake_host() {

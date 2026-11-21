@@ -1,5 +1,6 @@
 # Check and bundle a content repository (docs, www, spec) for the Nabi sites.
-# A vX.Y.Z branch is checked with nabi X.Y.Z, main with the latest release.
+# A vX.Y.Z branch is checked with nabi X.Y.Z, main with the newest release
+# (the newest rc while there is no final).
 # A push that passes asks the deploy pipeline to rebuild the sites.
 name: Reusable / Check and bundle content
 
@@ -31,18 +32,19 @@ jobs:
       - name: Install zlib for the FFI examples
         run: sudo apt-get install -y -q zlib1g-dev
 
-      - name: Resolve the toolchain for this branch
+      - name: Pick the toolchain pin for this branch
         id: tc
+        # a vX.Y.Z branch is checked with nabi X.Y.Z; anything else with the
+        # newest final release, else the newest rc (install-nabi's rule)
         run: |
           case "$GITHUB_REF_NAME" in
             v[0-9]*.[0-9]*.[0-9]*) v="${GITHUB_REF_NAME#v}" ;;
-            *) v=$(gh release view -R nabi-lang/nabi --json tagName -q .tagName); v="${v#v}" ;;
+            *) v=latest ;;
           esac
           echo "version=$v" >> "$GITHUB_OUTPUT"
-        env:
-          GH_TOKEN: ${{ github.token }}
 
       - name: Install Nabi
+        id: nabi
         uses: nabi-lang/.github/actions/install-nabi@v1.0.2
         with:
           version: ${{ steps.tc.outputs.version }}
@@ -70,7 +72,7 @@ jobs:
           --repo "$GITHUB_REPOSITORY" --branch "$GITHUB_REF_NAME" --sha "$GITHUB_SHA"
           --toolchain "$TOOLCHAIN" --out bundle.nabion
         env:
-          TOOLCHAIN: ${{ steps.tc.outputs.version }}
+          TOOLCHAIN: ${{ steps.nabi.outputs.version }}
 
       - name: Upload the bundle artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

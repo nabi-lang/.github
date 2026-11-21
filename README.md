@@ -73,7 +73,7 @@ from `RUNNER_ARCH` (or the registry), since an emulated x64 Git Bash on arm64 sa
 
 | Input | Default | |
 |---|---|---|
-| `version` | | A toolchain pin: `0.2` (the newest final 0.2.x), `0.2.1` (exactly), `0.3.0-rc.1` |
+| `version` | | A toolchain pin: `0.2` (the newest final 0.2.x), `0.2.1` (exactly), `0.3.0-rc.1`, `latest` |
 | `pin` | | Path of a `nabi.nabion`; installs what its `toolchain:` pin accepts |
 | `candidate-run` | | A run id of `nabi-lang/nabi`; installs this host's archive from its `dist-*` artifacts (needs `actions: read`) |
 | `home` | `~/.nabi` | `NABI_HOME` |
@@ -87,7 +87,9 @@ A series pin (`0.2`) takes the newest final release of the series: never a draft
 marked prerelease, or a tag with a `-` suffix. Only while the series has no final release at all
 does it take the newest `0.2.Z-rc.N` that is not a draft, with a warning (`no final 0.2 release
 yet; using 0.2.0-rc.2`); once `0.2.0` is out the series picks it. An exact pin (`0.2.1`,
-`0.3.0-rc.1`) installs exactly that release, never a candidate of it.
+`0.3.0-rc.1`) installs exactly that release, never a candidate of it. `latest` is the series rule
+over every series: the newest final release, else the newest rc with a warning. Only `version`
+takes it; a `nabi.nabion` pinning `latest` is refused.
 
 The signature is checked with minisign 0.12, downloaded from its GitHub release and pinned by
 SHA-256 for Linux (x64, arm64), Windows (x64, arm64) and macOS (arm64), the same pins as the
