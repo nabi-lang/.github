@@ -29,9 +29,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Clone path dependencies
-        uses: nabi-lang/.github/actions/clone-path-deps@v1.0.2
+        uses: nabi-lang/.github/actions/clone-path-deps@v1.0.3
       - name: Install Nabi from the nabi.nabion pin
-        uses: nabi-lang/.github/actions/install-nabi@v1.0.2
+        uses: nabi-lang/.github/actions/install-nabi@v1.0.3
         with:
           pin: nabi.nabion
       - name: Check format with nabi fmt
@@ -57,9 +57,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Clone path dependencies
-        uses: nabi-lang/.github/actions/clone-path-deps@v1.0.2
+        uses: nabi-lang/.github/actions/clone-path-deps@v1.0.3
       - name: Install Nabi from the nabi.nabion pin
-        uses: nabi-lang/.github/actions/install-nabi@v1.0.2
+        uses: nabi-lang/.github/actions/install-nabi@v1.0.3
         with:
           pin: nabi.nabion
       - name: Run nabi test
@@ -76,9 +76,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Clone path dependencies
-        uses: nabi-lang/.github/actions/clone-path-deps@v1.0.2
+        uses: nabi-lang/.github/actions/clone-path-deps@v1.0.3
       - name: Install Nabi from the nabi.nabion pin
-        uses: nabi-lang/.github/actions/install-nabi@v1.0.2
+        uses: nabi-lang/.github/actions/install-nabi@v1.0.3
         with:
           pin: nabi.nabion
       # same release and checksum as nabi's scripts/test/wasm.sh

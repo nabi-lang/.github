@@ -39,7 +39,7 @@
   would change every caller at once, untested.
 - Callers pin an exact release, never `@main`, the reusable workflows as well as the actions.
   Until `v1.0.2` exists on GitHub, every caller names the tag:
-  `uses: nabi-lang/.github/actions/install-nabi@v1.0.2`. Once it is pushed and locked, the
+  `uses: nabi-lang/.github/actions/install-nabi@v1.0.3`. Once it is pushed and locked, the
   callers switch to its commit, as for third-party actions:
   `uses: nabi-lang/.github/actions/install-nabi@<sha> # v1.0.2`.
   Dependabot (`github-actions` ecosystem) bumps the pins.
@@ -212,7 +212,7 @@ Outputs: `issue`, `record` (compact JSON), `state`. Permissions: `issues: write`
 jobs:
   package:
     name: Package
-    uses: nabi-lang/.github/.github/workflows/reusable-package.yml@v1.0.2
+    uses: nabi-lang/.github/.github/workflows/reusable-package.yml@v1.0.3
     with:
       wasm: true          # also nabi test --target wasm32-wasip2 under wasmtime
       publish-check: true # nabi publish --dry-run
@@ -254,7 +254,7 @@ in the merge queue. Each repository calls it as one more job of its CI:
 jobs:
   dco:
     name: DCO
-    uses: nabi-lang/.github/.github/workflows/reusable-dco.yml@v1.0.2
+    uses: nabi-lang/.github/.github/workflows/reusable-dco.yml@v1.0.3
 ```
 
 The repository's `ci-gate` job needs `dco` too.

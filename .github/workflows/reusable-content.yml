@@ -45,7 +45,7 @@ jobs:
 
       - name: Install Nabi
         id: nabi
-        uses: nabi-lang/.github/actions/install-nabi@v1.0.2
+        uses: nabi-lang/.github/actions/install-nabi@v1.0.3
         with:
           version: ${{ steps.tc.outputs.version }}
 
@@ -85,7 +85,7 @@ jobs:
     needs: bundle
     if: github.event_name == 'push'
     permissions: {}
-    uses: nabi-lang/.github/.github/workflows/reusable-deploy.yml@v1.0.2
+    uses: nabi-lang/.github/.github/workflows/reusable-deploy.yml@v1.0.3
     with:
       site: content
     secrets:
