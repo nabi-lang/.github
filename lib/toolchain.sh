@@ -14,7 +14,8 @@
 #
 # A pin is MAJOR.MINOR (newest final release of that series),
 # MAJOR.MINOR.PATCH (exactly that) or X.Y.Z-rc.N (that prerelease). A
-# series never resolves to a prerelease. install prints "version=<v>" and
+# series takes a prerelease only while it has no final release at all,
+# its newest X.Y.Z-rc.N, with a warning. install prints "version=<v>" and
 # "bin=<dir>" lines.
 #
 # A release install checks, failing closed: SHA256SUMS.minisig verifies
@@ -85,8 +86,19 @@ resolve() {
 	_rels=$(gh_releases "$NABI_REPO") || die "cannot list the releases of $NABI_REPO"
 	case $_k in
 	series)
-		_v=$(printf '%s\n' "$_rels" | awk -v p="v$1." '$2 == "false" && $3 == "false" && index($1, p) == 1 && $1 !~ /-/ { print substr($1, 2) }' |
-			sort -t . -k 1,1n -k 2,2n -k 3,3n | tail -n 1)
+		# finals are neither drafts, nor marked prerelease, nor suffixed
+		_v=$(printf '%s\n' "$_rels" | awk -v p="v$1." '$2 == "false" && $3 == "false" && index($1, p) == 1 {
+			r = substr($1, length(p) + 1)
+			if (r ~ /^[0-9]+$/) print r, substr($1, 2)
+		}' | sort -k 1,1n | tail -n 1 | cut -d ' ' -f 2)
+		if [ -z "$_v" ]; then
+			# no final yet: the newest candidate of the series
+			_v=$(printf '%s\n' "$_rels" | awk -v p="v$1." '$3 == "false" && index($1, p) == 1 {
+				r = substr($1, length(p) + 1)
+				if (r ~ /^[0-9]+-rc\.[0-9]+$/) { split(r, a, /-rc\./); print a[1], a[2], substr($1, 2) }
+			}' | sort -k 1,1n -k 2,2n | tail -n 1 | cut -d ' ' -f 3)
+			[ -z "$_v" ] || echo "::warning::install-nabi: no final $1 release yet; using $_v" >&2
+		fi
 		;;
 	*)
 		_v=$(printf '%s\n' "$_rels" | awk -v t="v$1" '$1 == t && $3 == "false" { print substr($1, 2) }')

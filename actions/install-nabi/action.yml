@@ -9,7 +9,7 @@ name: Install Nabi
 description: Install a Nabi toolchain from GitHub releases or a run's dist artifacts, checked against the signed SHA256SUMS and the build attestation.
 inputs:
   version:
-    description: 'A toolchain pin: "0.2" (newest final 0.2.x, never an rc), "0.2.1" (exactly), "0.3.0-rc.1" (that prerelease)'
+    description: 'A toolchain pin: "0.2" (newest final 0.2.x; its newest rc, with a warning, only while 0.2 has no final), "0.2.1" (exactly), "0.3.0-rc.1" (that prerelease)'
     default: ""
   pin:
     description: Path of a nabi.nabion; installs what its toolchain pin accepts

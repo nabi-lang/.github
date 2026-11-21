@@ -15,6 +15,10 @@ inst() { sh "$tc" install --release-key "$SHIM/test.pub" --minisign "$ms" "$@"; 
 
 state '{repos: {"nabi-lang/nabi": {releases: [
 	{tag_name: "v0.20.0", prerelease: false, draft: false},
+	{tag_name: "v0.4.1-rc.1", prerelease: true, draft: true},
+	{tag_name: "v0.4.0-rc.10", prerelease: true, draft: false},
+	{tag_name: "v0.4.0-rc.2", prerelease: true, draft: false},
+	{tag_name: "v0.4.0-beta.1", prerelease: true, draft: false},
 	{tag_name: "v0.3.0-rc.2", prerelease: true, draft: true},
 	{tag_name: "v0.3.0-rc.1", prerelease: true, draft: false},
 	{tag_name: "v0.2.12-rc.1", prerelease: false, draft: false},
@@ -34,17 +38,26 @@ has "$err" 'add toolchain: "0.2"'
 
 t_case "resolve"
 eq "$(sh "$tc" resolve 0.2)" 0.2.9 "series: newest final, drafts and 0.20 left out"
+err=$(sh "$tc" resolve 0.2 2>&1 > /dev/null)
+hasnt "$err" "::warning::" "a series with a final"
 eq "$(sh "$tc" resolve 0.2.1)" 0.2.1 exact
 eq "$(sh "$tc" resolve 0.3.0-rc.1)" 0.3.0-rc.1 prerelease
 eq "$(sh "$tc" resolve 0.2.11-rc.1)" 0.2.11-rc.1 "prerelease of a series"
 eq "$(sh "$tc" kind 0.3.0-rc.1)" pre
 err=$(sh "$tc" resolve 0.3.0-rc.2 2>&1) && fail "a draft prerelease resolved"
 has "$err" 'no published nabi release matches toolchain "0.3.0-rc.2"'
-err=$(sh "$tc" resolve 0.3 2>&1) && fail "series 0.3 resolved to its rc"
-has "$err" 'no published nabi release matches toolchain "0.3"'
+t_case "a series with no final takes its newest rc"
+eq "$(sh "$tc" resolve 0.3 2> /dev/null)" 0.3.0-rc.1 "the draft rc.2 left out"
+err=$(sh "$tc" resolve 0.3 2>&1 > /dev/null)
+has "$err" "::warning::install-nabi: no final 0.3 release yet; using 0.3.0-rc.1"
+eq "$(sh "$tc" resolve 0.4 2> /dev/null)" 0.4.0-rc.10 "rc.10 over rc.2, the draft 0.4.1-rc.1 and a beta left out"
+eq "$(sh "$tc" resolve 0.4.0-rc.2)" 0.4.0-rc.2 "an exact rc pin"
+err=$(sh "$tc" resolve 0.4.0 2>&1) && fail "an exact pin took an rc"
+has "$err" 'no published nabi release matches toolchain "0.4.0"'
 err=$(sh "$tc" resolve 0.2.10 2>&1) && fail "a draft resolved"
 has "$err" 'no published nabi release matches toolchain "0.2.10"'
-err=$(sh "$tc" resolve 0.4 2>&1) && fail "0.4 resolved"
+err=$(sh "$tc" resolve 0.5 2>&1) && fail "0.5 resolved"
+has "$err" 'no published nabi release matches toolchain "0.5"'
 for bad in "0" "0.2.x" "^0.2" "v0.2" "0.2.0-beta" "0.2.0-rc" "0.2.0-rc.1.1" "0.2-rc.1"; do
 	err=$(sh "$tc" resolve "$bad" 2>&1) && fail "pin $bad accepted"
 	has "$err" 'write a series ("0.2")'
@@ -243,16 +256,23 @@ case $triple in
 	;;
 esac
 
-t_case "a prerelease installs only by its exact pin"
+t_case "a prerelease installs by its pin, or for a series with no final"
 fake_release 0.3.0-rc.1 "$dl/v0.3.0-rc.1"
 sign_release 0.3.0-rc.1 "$dl/v0.3.0-rc.1"
 out=$(inst --home "$SHIM/h8" --version 0.3.0-rc.1)
 has "$out" "version=0.3.0-rc.1"
 eq "$("$SHIM/h8/bin/nabi" --version)" "nabi 0.3.0-rc.1"
+printf 'Package {\n    name: "x",\n    toolchain: "0.3",\n}\n' > "$SHIM/rc.nabion"
+out=$(inst --home "$SHIM/h11" --pin-file "$SHIM/rc.nabion" 2>&1)
+has "$out" "version=0.3.0-rc.1"
+has "$out" "::warning::install-nabi: no final 0.3 release yet; using 0.3.0-rc.1"
+eq "$(calls '^GET attestation')" 2 "each rc's attestation checked"
+eq "$("$SHIM/h11/bin/nabi" --version)" "nabi 0.3.0-rc.1"
 fake_release 0.2.11-rc.1 "$dl/v0.2.11-rc.1"
 sign_release 0.2.11-rc.1 "$dl/v0.2.11-rc.1"
-out=$(inst --home "$SHIM/h9" --version 0.2)
-has "$out" "version=0.2.9" "a series never takes its rc"
+out=$(inst --home "$SHIM/h9" --version 0.2 2>&1)
+has "$out" "version=0.2.9" "a series with a final never takes its rc"
+hasnt "$out" "::warning::install-nabi: no final"
 
 t_case "a failed attestation is refused, unless turned off"
 touch "$SHIM/attest-fail"
