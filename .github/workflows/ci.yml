@@ -18,6 +18,8 @@ concurrency:
 jobs:
   dco:
     name: DCO
+    permissions:
+      contents: read
     uses: ./.github/workflows/reusable-dco.yml
 
   lint:
