@@ -43,7 +43,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: Install Nabi
-        uses: nabi-lang/.github/actions/install-nabi@v1.0.0
+        uses: nabi-lang/.github/actions/install-nabi@v1.0.2
         with:
           version: ${{ steps.tc.outputs.version }}
 
@@ -83,7 +83,7 @@ jobs:
     needs: bundle
     if: github.event_name == 'push'
     permissions: {}
-    uses: nabi-lang/.github/.github/workflows/reusable-deploy.yml@v1.0.0
+    uses: nabi-lang/.github/.github/workflows/reusable-deploy.yml@v1.0.2
     with:
       site: content
     secrets:

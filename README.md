@@ -38,14 +38,17 @@
 - Releases are immutable tags `vMAJOR.MINOR.PATCH`. There is no moving `v1` tag; a moving tag
   would change every caller at once, untested.
 - Callers pin an exact release, never `@main`, the reusable workflows as well as the actions.
-  Until `v1.0.0` exists on GitHub, every caller names the tag:
-  `uses: nabi-lang/.github/actions/install-nabi@v1.0.0`. Once it is pushed and locked, the
+  Until `v1.0.2` exists on GitHub, every caller names the tag:
+  `uses: nabi-lang/.github/actions/install-nabi@v1.0.2`. Once it is pushed and locked, the
   callers switch to its commit, as for third-party actions:
-  `uses: nabi-lang/.github/actions/install-nabi@<sha> # v1.0.0`.
+  `uses: nabi-lang/.github/actions/install-nabi@<sha> # v1.0.2`.
   Dependabot (`github-actions` ecosystem) bumps the pins.
 - A new optional input, a new manifest kind or a new probe is a minor release. A fix is a patch.
   A removed or renamed input, or a changed default, is a major release, and the previous major
   keeps working for one Nabi series.
+- The reusable workflows call the actions by tag, so the commit a release tags names that same
+  tag in their `uses:` lines; a tag on a commit that still names the previous release would
+  ship the new actions to direct callers only.
 - The actions find `lib/` and `release/` through `github.action_path`, so an action at `v1.2.0`
   always runs the `lib/` of `v1.2.0`.
 
@@ -207,7 +210,7 @@ Outputs: `issue`, `record` (compact JSON), `state`. Permissions: `issues: write`
 jobs:
   package:
     name: Package
-    uses: nabi-lang/.github/.github/workflows/reusable-package.yml@v1.0.0
+    uses: nabi-lang/.github/.github/workflows/reusable-package.yml@v1.0.2
     with:
       wasm: true          # also nabi test --target wasm32-wasip2 under wasmtime
       publish-check: true # nabi publish --dry-run
@@ -249,7 +252,7 @@ in the merge queue. Each repository calls it as one more job of its CI:
 jobs:
   dco:
     name: DCO
-    uses: nabi-lang/.github/.github/workflows/reusable-dco.yml@v1.0.0
+    uses: nabi-lang/.github/.github/workflows/reusable-dco.yml@v1.0.2
 ```
 
 The repository's `ci-gate` job needs `dco` too.
