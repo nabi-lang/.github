@@ -80,4 +80,4 @@ nabi new hello && cd hello && nabi run   # Hello, world!
 [CONTRIBUTING.md](https://github.com/nabi-lang/.github/blob/main/CONTRIBUTING.md)(커밋은 DCO에 따라 sign-off합니다), [행동 강령](https://github.com/nabi-lang/.github/blob/main/CODE_OF_CONDUCT.md), [GOVERNANCE.md](https://github.com/nabi-lang/.github/blob/main/GOVERNANCE.md)를 읽어 주세요.
 질문은 [토론](https://github.com/nabi-lang/nabi/discussions)에 올려 주세요. 보안 취약점은 비공개로 신고해 주세요([SECURITY.md](https://github.com/nabi-lang/.github/blob/main/SECURITY.md)).
 
-<p align="center"><sub><a href="https://daminstudio.com">DaminStudio</a> 만든 곳</sub></p>
+<p align="center"><sub><a href="https://daminstudio.com">DaminStudio</a>에서 만듭니다</sub></p>
