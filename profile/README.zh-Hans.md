@@ -50,7 +50,7 @@ nabi new hello && cd hello && nabi run   # Hello, world!
 
 ## 包
 
-官方包；用 `nabi add <name>` 添加。
+官方包。它们随工具链提供，使用它们的代码无需 `nabi add`；[packages.nabi-lang.org](https://packages.nabi-lang.org) 上的其他包用 `nabi add <name>` 添加。
 
 | 包 | |
 |---|---|

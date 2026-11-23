@@ -28,8 +28,8 @@ wanted` means a maintainer would welcome a pull request.
 | Repository | What |
 |---|---|
 | [nabi](https://github.com/nabi-lang/nabi) | Compiler, runtime, standard library, `nabi` tool, `nabils` |
-| [spec](https://github.com/nabi-lang/spec) | The language and standard library specification (English and Korean) |
-| [docs](https://github.com/nabi-lang/docs) | The guide, examples and error pages (English and Korean) |
+| [spec](https://github.com/nabi-lang/spec) | The language and standard library specification (English, Korean, Simplified and Traditional Chinese) |
+| [docs](https://github.com/nabi-lang/docs) | The guide, examples and error pages (English, Korean, Simplified and Traditional Chinese) |
 | [www](https://github.com/nabi-lang/www) | The pages of nabi-lang.org |
 | [nabi-syntax](https://github.com/nabi-lang/nabi-syntax) | TextMate and tree-sitter grammars |
 | [nabi.vscode](https://github.com/nabi-lang/nabi.vscode), [nabi.zed](https://github.com/nabi-lang/nabi.zed), [nabi.vim](https://github.com/nabi-lang/nabi.vim) | Editor support |
@@ -46,11 +46,12 @@ wanted` means a maintainer would welcome a pull request.
 - Fill in the pull request template. In nabi, end the description with the
   `changelog:` block; nowhere else edit `CHANGELOG.md` by hand.
 - A change in observable behavior of the language or standard library
-  updates the spec, in English and Korean, in the same change (or a linked
+  updates the spec, in all four editions, in the same change (or a linked
   pull request to nabi-lang/spec).
-- Text in docs, spec and www is written in English and Korean together:
-  `ko/` mirrors the English files. If you cannot write the Korean, say so
-  in the pull request and a maintainer will add it.
+- Text in docs, spec and www is written in four editions together:
+  English, Korean (`ko/`), Simplified Chinese (`zh-hans/`) and Traditional
+  Chinese (`zh-hant/`), each mirroring the English files. If you cannot
+  write an edition, say so in the pull request and a maintainer will add it.
 - Pull requests are merged by squash through the merge queue. Do not
   force-push a branch once review has started; add commits on top.
 

@@ -50,7 +50,7 @@ nabi new hello && cd hello && nabi run   # Hello, world!
 
 ## 套件
 
-官方套件；用 `nabi add <name>` 加入。
+官方套件。它們隨工具鏈提供，使用它們的程式碼不需要 `nabi add`；[packages.nabi-lang.org](https://packages.nabi-lang.org) 上的其他套件用 `nabi add <name>` 加入。
 
 | 套件 | |
 |---|---|

@@ -16,9 +16,9 @@ Discussions.
   [nabi-lang/nabi](https://github.com/nabi-lang/nabi/security/advisories/new).
 - Or email security@nabi-lang.org.
 
-Include what you can of: the affected repository and version (`nabi version
--v`, or the package version), the target, a minimal reproduction, the impact
-you see, and whether the issue is already public.
+Include what you can of: the affected repository and version (`nabi
+--version -v`, or the package version), the target, a minimal
+reproduction, the impact you see, and whether the issue is already public.
 
 A malicious or compromised package in the registry at packages.nabi-lang.org
 is reported the same way, on
@@ -71,7 +71,7 @@ denial of service from trusted input, a hardening gap, an issue only
 reachable through `unsafe` code that already misuses an API.
 
 - The fix is developed in the open, through a normal pull request, and
-  ships in the next scheduled release.
+  ships in the next release.
 - An advisory is published when the fix ships, if users need to act.
 
 ## Supported versions

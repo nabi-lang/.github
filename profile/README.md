@@ -50,7 +50,7 @@ nabi new hello && cd hello && nabi run   # Hello, world!
 
 ## Packages
 
-The official packages; add one with `nabi add <name>`.
+The official packages. They come with the toolchain, so code that uses one needs no `nabi add`; other packages from [packages.nabi-lang.org](https://packages.nabi-lang.org) are added with `nabi add <name>`.
 
 | Package | |
 |---|---|

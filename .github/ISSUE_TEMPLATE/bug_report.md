@@ -14,5 +14,5 @@ labels: "type: bug"
 
 ## Environment
 
-- Version (`nabi version` / `nabic version`, or the package version):
+- Version (`nabi --version -v`, or the package version):
 - OS and architecture:

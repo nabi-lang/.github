@@ -38,8 +38,9 @@ merges. The rest are made in public, in writing.
 3. **Language and standard library semantics**: the
    [spec](https://github.com/nabi-lang/spec) defines them. A change is
    proposed as an issue, then written as a pull request to the spec in
-   English and Korean, together with the implementation in nabi. The BDFL
-   accepts or declines it. The reasons for a decision are written in the
+   all four editions (English, Korean, Simplified and Traditional Chinese),
+   together with the implementation in nabi. The BDFL accepts or declines
+   it. The reasons for a decision are written in the
    issue or pull request, so a later reader can find why.
 4. **Breaking changes**: Nabi is pre-1.0. A breaking change ships only in
    an `0.X.0` release and is called out in `CHANGELOG.md`.

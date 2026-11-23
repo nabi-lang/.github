@@ -38,10 +38,9 @@
 - Releases are immutable tags `vMAJOR.MINOR.PATCH`. There is no moving `v1` tag; a moving tag
   would change every caller at once, untested.
 - Callers pin an exact release, never `@main`, the reusable workflows as well as the actions.
-  Until `v1.0.2` exists on GitHub, every caller names the tag:
-  `uses: nabi-lang/.github/actions/install-nabi@v1.0.3`. Once it is pushed and locked, the
-  callers switch to its commit, as for third-party actions:
-  `uses: nabi-lang/.github/actions/install-nabi@<sha> # v1.0.2`.
+  A caller names the tag, `uses: nabi-lang/.github/actions/install-nabi@v1.0.3`, as the
+  nabi-lang repositories do today, or its commit with the tag in a comment, as for third-party
+  actions: `uses: nabi-lang/.github/actions/install-nabi@<sha> # v1.0.3`.
   Dependabot (`github-actions` ecosystem) bumps the pins.
 - A new optional input, a new manifest kind or a new probe is a minor release. A fix is a patch.
   A removed or renamed input, or a changed default, is a major release, and the previous major

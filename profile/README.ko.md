@@ -50,7 +50,7 @@ nabi new hello && cd hello && nabi run   # Hello, world!
 
 ## 패키지
 
-공식 패키지입니다. `nabi add <name>`으로 추가하세요.
+공식 패키지입니다. 툴체인과 함께 설치되므로 코드에서 쓰기만 하면 되고 `nabi add`는 필요 없습니다. [packages.nabi-lang.org](https://packages.nabi-lang.org)의 다른 패키지는 `nabi add <name>`으로 추가합니다.
 
 | 패키지 | |
 |---|---|
