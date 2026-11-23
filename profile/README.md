@@ -9,6 +9,13 @@
 </p>
 
 <p align="center">
+  English &middot;
+  <a href="https://github.com/nabi-lang/.github/blob/main/profile/README.ko.md">한국어</a> &middot;
+  <a href="https://github.com/nabi-lang/.github/blob/main/profile/README.zh-Hans.md">简体中文</a> &middot;
+  <a href="https://github.com/nabi-lang/.github/blob/main/profile/README.zh-Hant.md">繁體中文</a>
+</p>
+
+<p align="center">
   <a href="https://nabi-lang.org">Site</a> &middot;
   <a href="https://docs.nabi-lang.org">Docs</a> &middot;
   <a href="https://packages.nabi-lang.org">Packages</a> &middot;
@@ -24,7 +31,7 @@ nabi new hello && cd hello && nabi run   # Hello, world!
 ## Core
 
 - [**nabi**](https://github.com/nabi-lang/nabi) - compiler, runtime, standard library, the `nabi` tool and the `nabils` language server
-- [**spec**](https://github.com/nabi-lang/spec) - the language and standard library specification, in English and Korean
+- [**spec**](https://github.com/nabi-lang/spec) - the language and standard library specification, in English, Korean and Chinese
 - [**docs**](https://github.com/nabi-lang/docs) - the guide, examples and error pages of docs.nabi-lang.org
 - [**www**](https://github.com/nabi-lang/www) - the pages of nabi-lang.org
 - [**nabi-lang.org**](https://github.com/nabi-lang/nabi-lang.org) - the generator of nabi-lang.org and docs.nabi-lang.org
